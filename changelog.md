@@ -1,1 +1,1 @@
-First release. Place a minecart on any block, no rail needed, and a parked cart picks up a mob that walks into it.
+First release. Set a minecart down on any block without a rail, stack one on another with shift-click, and a parked cart picks up a mob that walks into it.

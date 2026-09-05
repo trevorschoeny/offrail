@@ -1,22 +1,24 @@
 # Offrail
 
-Minecarts made less brittle. Two vanilla rules relaxed, nothing else changed.
+Offrail makes minecarts easier to live with. Vanilla minecarts are fine, but two of their rules get in the way: you can only set one down on a rail, and a cart only picks up a mob while it is moving. Offrail relaxes both without changing what a minecart is.
 
 ## Features
 
-Rail-free placement lets you set a minecart down on any block, not just a rail. Right-click a block with a minecart in hand and the cart lands there, centered, facing the way you were looking. Slabs, stairs, fences, glass, carpet and snow all work; water and lava do not. Rails still work exactly as before, and you can still stack a cart on top of another one with shift-click.
+Put a cart down anywhere. Right-click any block with a minecart in hand and the cart lands on it, centered and pointed the way you are looking. Slabs, stairs, fences, glass, carpet and snow all work. Water and lava do not. Click a rail and you get vanilla, cart on the rail, rail shape respected.
 
-Stationary pickup means a parked cart picks up a mob that walks into it. Vanilla only does this while the cart is moving. The mobs that get picked up, and where they have to touch the cart, are the same as vanilla.
+Stack carts. Shift-right-click a cart while holding another and the new one lands on top. A plain right-click still gets you in.
 
-Every cart type gets both: plain, chest, hopper, furnace, TNT and command block.
+Parked carts pick up mobs. A cart that is standing still picks up a mob that walks into it, the same mobs vanilla picks up at speed, with the same contact area. Mobs still do not climb out on their own.
 
-Each feature has its own switch under Mod Menu, Offrail.
+Placement and stacking work with every cart type: plain, chest, hopper, furnace, TNT and command block. Pickup is for the plain rideable cart, as in vanilla. Each feature has its own switch under Mod Menu, Offrail.
 
-## Requirements
+## Install
 
-- Fabric API
+Fabric API is the only requirement. Install Offrail on both client and server. A single-player world needs nothing more.
 
-Install on both client and server. Single-player works on its own.
+## Compatibility
+
+Minecraft 26.2, Fabric. Universal mod. On a dedicated server the server's config decides whether each feature is on. Offrail hooks vanilla with narrow mixins, so other mods that touch minecart placement or movement keep running.
 
 ## License
 
