@@ -68,10 +68,12 @@ public final class RailFreePlacement {
             return InteractionResult.FAIL;
         }
 
-        // Face the way the player is looking, snapped to N/S/E/W. Both rotation
-        // fields so the first rendered frame doesn't lerp from zero.
+        // Long axis along the player's look direction, snapped to N/S/E/W. A
+        // cart's yRot is perpendicular to its axis (yRot 0 is an east-west
+        // cart), hence the +90. Both rotation fields so the first rendered
+        // frame doesn't lerp from zero.
         Direction facing = player != null ? player.getDirection() : Direction.NORTH;
-        cart.setYRot(facing.toYRot());
+        cart.setYRot(facing.toYRot() + 90.0F);
         cart.yRotO = cart.getYRot();
 
         // Blocks only: stacking a cart on top of another cart is allowed
