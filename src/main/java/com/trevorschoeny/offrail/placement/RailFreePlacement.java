@@ -1,14 +1,18 @@
 package com.trevorschoeny.offrail.placement;
 
+import com.trevorschoeny.offrail.mixin.MinecartItemAccessor;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.MinecartItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,14 +21,14 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Rail-free placement (plan.md): put a minecart down on any block that isn't
- * a liquid. The cart lands centered on the clicked face, at the height of the
- * click (so a slab or carpet gets the cart on its surface, not floating half a
- * block up), facing the player's direction snapped to a cardinal.
+ * a liquid, or on top of another cart. The cart lands centered, at the height
+ * of the click (so a slab or carpet gets the cart on its surface, not floating
+ * half a block up), with its long axis along the player's look direction
+ * snapped to a cardinal.
  *
  * <p>Mirrors vanilla {@code MinecartItem.useOn} step for step (spawn reason,
- * game event, stack consumption), only the "must be a rail" gate and the
- * position differ. The caller has already established the clicked block is
- * not a rail; rails stay vanilla's.
+ * game event, stack consumption); only the "must be a rail" gate and the
+ * position differ. Rails stay vanilla's.
  */
 public final class RailFreePlacement {
 
@@ -35,13 +39,16 @@ public final class RailFreePlacement {
     private static final double REST_OFFSET = 0.0625;
 
     /**
+     * Block placement: the cart goes in the block space on the clicked side of
+     * the clicked block. The caller has already established that block is not
+     * a rail.
+     *
      * @return {@link InteractionResult#SUCCESS} if the cart was placed (or would
      *         be, on the client), {@link InteractionResult#FAIL} if the spot is
      *         a liquid or blocked.
      */
-    public static InteractionResult place(UseOnContext ctx, EntityType<? extends AbstractMinecart> type) {
+    public static InteractionResult placeOnBlock(UseOnContext ctx, EntityType<? extends AbstractMinecart> type) {
         Level level = ctx.getLevel();
-        // The cart goes in the block space on the clicked side of the clicked block.
         BlockPos target = ctx.getClickedPos().relative(ctx.getClickedFace());
         BlockState targetState = level.getBlockState(target);
 
@@ -60,8 +67,31 @@ public final class RailFreePlacement {
                 : target.getY() + REST_OFFSET;
         Vec3 pos = new Vec3(target.getX() + 0.5, y, target.getZ() + 0.5);
 
-        ItemStack stack = ctx.getItemInHand();
-        Player player = ctx.getPlayer();
+        return spawn(level, pos, target, type, ctx.getItemInHand(), ctx.getPlayer());
+    }
+
+    /**
+     * Stacking: shift-right-click an existing cart while holding a minecart
+     * item puts the new cart on top of it. Vanilla never reaches {@code useOn}
+     * here because the raycast stops at the entity, so this is its own path
+     * (Fabric's UseEntityCallback, registered in the mod initializer).
+     *
+     * @return {@link InteractionResult#PASS} when this click isn't a stack
+     *         (not sneaking, not holding a cart), so vanilla handles it.
+     */
+    public static InteractionResult stackOnCart(Player player, Level level, Entity target, ItemStack held) {
+        if (!(target instanceof AbstractMinecart below)) return InteractionResult.PASS;
+        if (!player.isSecondaryUseActive()) return InteractionResult.PASS;
+        if (!(held.getItem() instanceof MinecartItem item)) return InteractionResult.PASS;
+
+        Vec3 pos = new Vec3(below.getX(), below.getBoundingBox().maxY + REST_OFFSET, below.getZ());
+        return spawn(level, pos, below.blockPosition(), ((MinecartItemAccessor) item).offrail$type(), held, player);
+    }
+
+    /** Shared tail of both paths: create, orient, collision-check, add, consume. */
+    private static InteractionResult spawn(Level level, Vec3 pos, BlockPos eventPos,
+                                           EntityType<? extends AbstractMinecart> type,
+                                           ItemStack stack, Player player) {
         AbstractMinecart cart = AbstractMinecart.createMinecart(
                 level, pos.x, pos.y, pos.z, type, EntitySpawnReason.DISPENSER, stack, player);
         if (cart == null) {
@@ -84,8 +114,8 @@ public final class RailFreePlacement {
 
         if (level instanceof ServerLevel serverLevel) {
             serverLevel.addFreshEntity(cart);
-            serverLevel.gameEvent(GameEvent.ENTITY_PLACE, target,
-                    GameEvent.Context.of(player, level.getBlockState(target.below())));
+            serverLevel.gameEvent(GameEvent.ENTITY_PLACE, eventPos,
+                    GameEvent.Context.of(player, level.getBlockState(eventPos.below())));
         }
         // Same as vanilla: the server-side count drops; creative mode restores it.
         stack.shrink(1);

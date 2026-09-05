@@ -37,6 +37,6 @@ public abstract class MinecartItemPlacementMixin {
     private void offrail$placeOffRail(UseOnContext ctx, CallbackInfoReturnable<InteractionResult> cir) {
         if (!OffrailConfig.railFreePlacement()) return;
         if (ctx.getLevel().getBlockState(ctx.getClickedPos()).is(BlockTags.RAILS)) return;
-        cir.setReturnValue(RailFreePlacement.place(ctx, this.type));
+        cir.setReturnValue(RailFreePlacement.placeOnBlock(ctx, this.type));
     }
 }

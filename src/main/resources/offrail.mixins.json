@@ -4,6 +4,7 @@
   "package": "com.trevorschoeny.offrail.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "MinecartItemAccessor",
     "MinecartItemPlacementMixin",
     "OldMinecartBehaviorPickupMixin"
   ],
