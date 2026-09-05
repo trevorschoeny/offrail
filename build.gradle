@@ -1,0 +1,127 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// Offrail — minecarts made less brittle. Universal Fabric mod (environment
+// "*"): both features are server-side entity logic (spawning a cart on a bare
+// block, letting a still cart pick up a mob), so the mod has to be on the
+// server; in single-player the integrated server carries it. The client half
+// is only the YACL config screen. No MenuKit: nothing here draws UI.
+//
+// Design: Trevlar Mods drive, mods/offrail/plan.md. House rules: Trevlar Mods
+// drive, guidelines/building-mods.md and guidelines/ci-cd.md.
+//
+// Build: `./gradlew :offrail:build` from the workspace root (the composite
+// build in ~/Projects/Minecraft/Trevlar Mods). Test scene:
+// `test-gallery/run-scene.sh offrail <scene>`.
+// ═══════════════════════════════════════════════════════════════════════════
+
+plugins {
+    // Loom 1.17 is the 26.2-era line; the version is pinned at the workspace root.
+    id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
+    id 'java'
+    id 'com.modrinth.minotaur' version '2.+'
+}
+
+version = property('offrail_version')
+group   = property('maven_group')
+
+base.archivesName = 'offrail'
+
+java {
+    // Minecraft 26.x runs on Java 25.
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+repositories {
+    maven { url 'https://maven.fabricmc.net/' }
+    // ModMenu — Terraformers' Maven.
+    maven { url 'https://maven.terraformersmc.com/releases/' }
+    // YACL — the 26.2 builds (3.9.x) ship via the Modrinth maven only.
+    maven { url 'https://api.modrinth.com/maven' }
+}
+
+dependencies {
+    // 26.x: the game is unobfuscated — no mappings line; mod deps use the
+    // standard java configurations.
+    minecraft "com.mojang:minecraft:${property('minecraft_version')}"
+    implementation "net.fabricmc:fabric-loader:${property('loader_version')}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${property('fabric_version')}"
+
+    // ModMenu — surfaces the config screen from the mods list. Soft dep at
+    // runtime; compileOnly for the API, localRuntime for the dev launch.
+    compileOnly "com.terraformersmc:modmenu:20.0.1"
+    localRuntime "com.terraformersmc:modmenu:20.0.1"
+
+    // YACL — config-screen framework, bundled into the jar (Jar-in-Jar) per
+    // building-mods.md. implementation = compile + dev runtime; include = JIJ.
+    implementation "maven.modrinth:yacl:3.9.6+26.2-fabric"
+    include        "maven.modrinth:yacl:3.9.6+26.2-fabric"
+}
+
+loom {
+    runs {
+        client { ideConfigGenerated = false }
+        server { ideConfigGenerated = false }
+        // Test Gallery: boots straight into the generated test world in run/saves/TestGallery.
+        // Generate it with `test-gallery/run-scene.sh offrail <scene>` (which also runs this).
+        testGallery {
+            inherit client
+            name 'Test Gallery'
+            programArgs '--quickPlaySingleplayer', 'TestGallery'
+            ideConfigGenerated = false
+        }
+    }
+}
+
+jar {
+    from('LICENSE') { rename { "${it}_${project.name}" } }
+}
+
+// Stamp the real project version into fabric.mod.json at build — the manifest
+// declares "version": "${version}"; a hardcoded manifest version silently
+// breaks every dependency gate against this mod.
+processResources {
+    inputs.property "version", project.version
+    filesMatching("fabric.mod.json") {
+        expand "version": inputs.properties.version
+    }
+}
+
+// ── Modrinth Publishing ────────────────────────────────────────────────
+// Lead creates the Modrinth project (new-mod-setup.md step 5) and fills in
+// the project id here. Only Lead runs these tasks.
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    projectId = "TODO-lead-fills-in"
+    versionNumber = property('offrail_version')
+    versionName = "Offrail ${property('offrail_version')}"
+    versionType = "release"
+    // ci-cd.md stage 5: the player-facing changelog lives in changelog.md, one entry,
+    // overwritten each release (git keeps the history).
+    changelog = file('changelog.md').text
+    // ci-cd.md stage 7: the README is the public description; `modrinthSyncBody` pushes it.
+    syncBodyFrom = file('README.md').text
+    // 26.x: no remap step — `jar` IS the shippable artifact.
+    uploadFile = jar
+    gameVersions = [property('minecraft_version')]
+    loaders = ["fabric"]
+    dependencies {
+        required.project "fabric-api"
+    }
+}
+
+// ci-cd.md stage 2: the shipped jar must self-report the bumped version. A jar that
+// says the wrong version silently breaks every dependency gate against it, so this
+// fails the build instead of relying on someone remembering to unzip and look.
+tasks.register('verifyJarVersion') {
+    dependsOn 'jar'
+    doLast {
+        def jar = tasks.named('jar').get().archiveFile.get().asFile
+        def modJson = zipTree(jar).matching { include 'fabric.mod.json' }.singleFile
+        def stamped = new groovy.json.JsonSlurper().parse(modJson).version
+        if (stamped != project.version.toString()) {
+            throw new GradleException("${jar.name}: fabric.mod.json says ${stamped}, expected ${project.version}")
+        }
+        println "verifyJarVersion: ${jar.name} reports ${stamped}"
+    }
+}
+build.dependsOn verifyJarVersion

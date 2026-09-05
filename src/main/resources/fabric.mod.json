@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "offrail",
+  "version": "${version}",
+  "name": "Offrail",
+  "description": "Minecarts made less brittle: place them on any block, and a parked cart still picks up mobs.",
+  "authors": ["trevorschoeny"],
+  "license": "MIT",
+  "environment": "*",
+  "mixins": [
+    "offrail.mixins.json"
+  ],
+  "entrypoints": {
+    "main": ["com.trevorschoeny.offrail.Offrail"],
+    "modmenu": ["com.trevorschoeny.offrail.config.OffrailConfigModMenu"]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "~26.2"
+  }
+}
