@@ -117,8 +117,10 @@ public final class RailFreePlacement {
             serverLevel.gameEvent(GameEvent.ENTITY_PLACE, eventPos,
                     GameEvent.Context.of(player, level.getBlockState(eventPos.below())));
         }
-        // Same as vanilla: the server-side count drops; creative mode restores it.
-        stack.shrink(1);
+        // consume, not shrink: creative players keep the item. Vanilla's block
+        // path restores the count afterwards anyway, but the entity path
+        // (stacking) has no such restore, so the check has to live here.
+        stack.consume(1, player);
         return InteractionResult.SUCCESS;
     }
 }
