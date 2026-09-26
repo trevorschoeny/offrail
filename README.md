@@ -1,10 +1,10 @@
 # Offrail
 
-Offrail makes minecarts easier to live with. Vanilla minecarts are fine, but two of their rules get in the way: you can only set one down on a rail, and a cart only picks up a mob while it is moving. Offrail relaxes both without changing what a minecart is.
+Offrail makes minecarts easier to live with. Two of vanilla's minecart rules get in the way: you can only set a cart down on a rail, and a cart only picks up a mob while it is moving. Offrail relaxes both without changing what a minecart is.
 
 ## Features
 
-Put a cart down anywhere. Right-click any block with a minecart in hand and the cart lands on it, centered and pointed the way you are looking. Slabs, stairs, fences, glass, carpet and snow all work. Water and lava do not. Click a rail and you get vanilla, cart on the rail, rail shape respected.
+Put a cart down anywhere. Right-click any block with a minecart in hand and the cart lands on it, centered and pointed the way you are looking. Slabs, stairs, fences, glass, carpet and snow all work. Water and lava do not. Click a rail and you get vanilla behavior: the cart goes on the rail and follows its shape.
 
 Stack carts. Shift-right-click a cart while holding another and the new one lands on top. A plain right-click still gets you in.
 
