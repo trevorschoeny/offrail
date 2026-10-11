@@ -20,7 +20,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Rail-free placement (plan.md): put a minecart down on any block that isn't
+ * Rail-free placement: put a minecart down on any block that isn't
  * a liquid, or on top of another cart. The cart lands centered, at the height
  * of the click (so a slab or carpet gets the cart on its surface, not floating
  * half a block up), with its long axis along the player's look direction
@@ -52,7 +52,7 @@ public final class RailFreePlacement {
         BlockPos target = ctx.getClickedPos().relative(ctx.getClickedFace());
         BlockState targetState = level.getBlockState(target);
 
-        // Liquids are the one excluded surface (plan.md). Clicking through water
+        // Liquids are the one excluded surface. Clicking through water
         // hits the seabed, so the check has to be on the landing space, not the
         // clicked block.
         if (!targetState.getFluidState().isEmpty()) {
@@ -106,8 +106,8 @@ public final class RailFreePlacement {
         cart.setYRot(facing.toYRot() + 90.0F);
         cart.yRotO = cart.getYRot();
 
-        // Blocks only: stacking a cart on top of another cart is allowed
-        // (plan.md), so entity collisions are deliberately not checked.
+        // Blocks only: stacking a cart on top of another cart is allowed,
+        // so entity collisions are deliberately not checked.
         if (!level.noBlockCollision(cart, cart.getBoundingBox())) {
             return InteractionResult.FAIL;
         }

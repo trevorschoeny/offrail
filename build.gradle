@@ -1,17 +1,12 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// Offrail — minecarts made less brittle. Universal Fabric mod (environment
+// Offrail makes minecarts less brittle. It is a universal Fabric mod (environment
 // "*"): both features are server-side entity logic (spawning a cart on a bare
 // block, letting a still cart pick up a mob), so the mod has to be on the
-// server; in single-player the integrated server carries it. The client half
-// is only the YACL config screen. No MenuKit: nothing here draws UI.
-//
-// Design: Trevlar Mods drive, mods/offrail/plan.md. House rules: Trevlar Mods
-// drive, guidelines/building-mods.md and guidelines/ci-cd.md.
+// server. In single-player the integrated server carries it. The client half
+// is only the YACL config screen. No MenuKit, since nothing here draws UI.
 //
 // Build: `./gradlew :offrail:build` from the workspace root (the composite
 // build in ~/Projects/Minecraft/Trevlar Mods). Test scene:
 // `test-gallery/run-scene.sh offrail <scene>`.
-// ═══════════════════════════════════════════════════════════════════════════
 
 plugins {
     // Loom 1.17 is the 26.2-era line; the version is pinned at the workspace root.
@@ -33,26 +28,26 @@ java {
 
 repositories {
     maven { url 'https://maven.fabricmc.net/' }
-    // ModMenu — Terraformers' Maven.
+    // ModMenu, from Terraformers' Maven.
     maven { url 'https://maven.terraformersmc.com/releases/' }
-    // YACL — the 26.2 builds (3.9.x) ship via the Modrinth maven only.
+    // YACL: the 26.2 builds (3.9.x) are only on this Maven repository.
     maven { url 'https://api.modrinth.com/maven' }
 }
 
 dependencies {
-    // 26.x: the game is unobfuscated — no mappings line; mod deps use the
-    // standard java configurations.
+    // 26.x: the game is unobfuscated, so there is no mappings line and mod deps
+    // use the standard java configurations.
     minecraft "com.mojang:minecraft:${property('minecraft_version')}"
     implementation "net.fabricmc:fabric-loader:${property('loader_version')}"
     implementation "net.fabricmc.fabric-api:fabric-api:${property('fabric_version')}"
 
-    // ModMenu — surfaces the config screen from the mods list. Soft dep at
-    // runtime; compileOnly for the API, localRuntime for the dev launch.
+    // ModMenu surfaces the config screen from the mods list. Soft dep at
+    // runtime: compileOnly for the API, localRuntime for the dev launch.
     compileOnly "com.terraformersmc:modmenu:20.0.1"
     localRuntime "com.terraformersmc:modmenu:20.0.1"
 
-    // YACL — config-screen framework, bundled into the jar (Jar-in-Jar) per
-    // building-mods.md. implementation = compile + dev runtime; include = JIJ.
+    // YACL, the config-screen framework, is bundled into the jar (Jar-in-Jar).
+    // implementation = compile + dev runtime; include = JIJ.
     implementation "maven.modrinth:yacl:3.9.6+26.2-fabric"
     include        "maven.modrinth:yacl:3.9.6+26.2-fabric"
 }
@@ -76,7 +71,7 @@ jar {
     from('LICENSE') { rename { "${it}_${project.name}" } }
 }
 
-// Stamp the real project version into fabric.mod.json at build — the manifest
+// Stamp the real project version into fabric.mod.json at build. The manifest
 // declares "version": "${version}"; a hardcoded manifest version silently
 // breaks every dependency gate against this mod.
 processResources {
@@ -109,7 +104,7 @@ modrinth {
     }
 }
 
-// ci-cd.md stage 2: the shipped jar must self-report the bumped version. A jar that
+// The shipped jar must self-report the bumped version. A jar that
 // says the wrong version silently breaks every dependency gate against it, so this
 // fails the build instead of relying on someone remembering to unzip and look.
 tasks.register('verifyJarVersion') {

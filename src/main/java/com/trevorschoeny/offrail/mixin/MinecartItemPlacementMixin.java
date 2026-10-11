@@ -23,10 +23,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * rail, Offrail places the cart itself and the vanilla body never runs. Rails
  * fall through untouched, so vanilla keeps its rail-shape and slope handling.
  *
- * <p>Site choice (plan.md asked for the trade-off to be weighed): hooking
- * {@code MinecartItem} keeps the blast radius to the one item class and
- * leaves the entity spawn helper and the block-interaction path alone, so
- * other mods hooking either of those still see vanilla behaviour.
+ * <p>Why this site: hooking {@code MinecartItem} keeps the blast radius to
+ * the one item class and leaves the entity spawn helper and the
+ * block-interaction path alone, so other mods hooking either of those still see vanilla behaviour.
  */
 @Mixin(MinecartItem.class)
 public abstract class MinecartItemPlacementMixin {

@@ -15,9 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * Offrail config: one toggle per feature, both default on, no master switch
- * (plan.md). Same static-field + JSON shape as the other house mods;
- * persisted to {@code config/offrail/config.json}.
+ * Offrail config: one toggle per feature, both default on, no master switch.
+ * Same static-field + JSON shape as the other house mods, persisted to
+ * {@code config/offrail/config.json}.
  *
  * <p>Both toggles are read on the server (placement runs in the item's
  * use-on, pickup in the cart's tick). On a dedicated server the server's

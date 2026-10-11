@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.At;
  * other conditions (rideable cart, empty, mob not a player/golem/cart, mob
  * not already riding) are vanilla's and untouched.
  *
- * <p>Survey (plan.md asked): this is the only velocity gate on pickup.
+ * <p>This is the only velocity gate on pickup.
  * {@code NewMinecartBehavior} (the "minecart improvements" experiment) has no
  * such gate at all, so under that flag stationary pickup already happens and
  * this mixin has nothing to do. The mob AI side has no cart awareness.
