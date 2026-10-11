@@ -18,7 +18,7 @@ Fabric API is the only requirement. Install Offrail on both client and server. A
 
 ## Compatibility
 
-Minecraft 26.2, Fabric. Universal mod. On a dedicated server the server's config decides whether each feature is on. Offrail hooks vanilla with narrow mixins, so other mods that touch minecart placement or movement keep running.
+Minecraft 26.3, Fabric. Universal mod. On a dedicated server the server's config decides whether each feature is on. Offrail hooks vanilla with narrow mixins, so other mods that touch minecart placement or movement keep running.
 
 ## License
 
