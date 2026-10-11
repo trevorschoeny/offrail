@@ -43,13 +43,13 @@ dependencies {
 
     // ModMenu surfaces the config screen from the mods list. Soft dep at
     // runtime: compileOnly for the API, localRuntime for the dev launch.
-    compileOnly "com.terraformersmc:modmenu:20.0.1"
-    localRuntime "com.terraformersmc:modmenu:20.0.1"
+    compileOnly "com.terraformersmc:modmenu:21.0.0"
+    localRuntime "com.terraformersmc:modmenu:21.0.0"
 
     // YACL, the config-screen framework, is bundled into the jar (Jar-in-Jar).
     // implementation = compile + dev runtime; include = JIJ.
-    implementation "maven.modrinth:yacl:3.9.6+26.2-fabric"
-    include        "maven.modrinth:yacl:3.9.6+26.2-fabric"
+    implementation "maven.modrinth:yacl:3.9.7+26.3-fabric"
+    include        "maven.modrinth:yacl:3.9.7+26.3-fabric"
 }
 
 loom {
