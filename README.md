@@ -4,13 +4,19 @@ Offrail makes minecarts easier to live with. Two of vanilla's minecart rules get
 
 ## Features
 
-Put a cart down anywhere. Right-click any block with a minecart in hand and the cart lands on it, centered and pointed the way you are looking. Slabs, stairs, fences, glass, carpet and snow all work. Water and lava do not. Click a rail and you get vanilla behavior: the cart goes on the rail and follows its shape.
-
-Stack carts. Shift-right-click a cart while holding another and the new one lands on top. A plain right-click still gets you in.
-
-Parked carts pick up mobs. A cart that is standing still picks up a mob that walks into it, the same mobs vanilla picks up at speed, with the same contact area. Mobs still do not climb out on their own.
-
 Placement and stacking work with every cart type: plain, chest, hopper, furnace, TNT and command block. Pickup is for the plain rideable cart, as in vanilla. Each feature has its own switch under Mod Menu, Offrail.
+
+### Put a cart down anywhere
+
+Right-click any block with a minecart in hand and the cart lands on it, centered and pointed the way you are looking. Slabs, stairs, fences, glass, carpet and snow all work. Water and lava do not. Click a rail and you get vanilla behavior: the cart goes on the rail and follows its shape.
+
+### Stack carts
+
+Shift-right-click a cart while holding another and the new one lands on top. A plain right-click still gets you in.
+
+### Parked carts pick up mobs
+
+A cart that is standing still picks up a mob that walks into it, the same mobs vanilla picks up at speed, with the same contact area. Mobs still do not climb out on their own.
 
 ## Install
 
