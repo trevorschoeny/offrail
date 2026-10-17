@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldSave;
+import net.minecraft.resources.Identifier;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +48,18 @@ final class SceneWorld {
      * world builds its stations only once, on first load.
      */
     static Opened open(ClientGameTestContext ctx, String mod, String scene) {
+        Opened opened = openUnchecked(ctx, mod, scene);
+        // gen.py records every scene command that failed (storage gallery:state errors). A check
+        // on a scene that did not build as written would be testing something else.
+        String errors = errors(opened.world());
+        if (!errors.isEmpty()) {
+            opened.close();
+            throw new AssertionError("scene " + mod + "/" + scene + " did not build as written:\n" + errors);
+        }
+        return opened;
+    }
+
+    static Opened openUnchecked(ClientGameTestContext ctx, String mod, String scene) {
         Path gallery = Path.of(System.getProperty("testgallery.dir"));
         TestWorldSave save;
         try (TestSingleplayerContext fresh = ctx.worldBuilder().create()) {
@@ -67,9 +80,25 @@ final class SceneWorld {
         // inventory, give the scene's. Anything set up before it would be wiped, so wait for the
         // teleport. Every plate's stand point shares one z, a few blocks north of spawn.
         double standZ = stations.get(0).getAsJsonObject().getAsJsonArray("stand").get(2).getAsDouble();
-        ctx.waitFor(mc -> mc.player != null && Math.abs(mc.player.getZ() - standZ) < 0.01);
+        try {
+            ctx.waitFor(mc -> mc.player != null && Math.abs(mc.player.getZ() - standZ) < 0.01);
+        } catch (AssertionError e) {
+            world.close();   // leave no world open behind a failure, or nothing after it can open one
+            throw new AssertionError("gallery:join never ran in " + mod + "/" + scene
+                    + " (a function that fails to parse, e.g. an item from a mod not loaded, is skipped whole)", e);
+        }
         world.getConnection().waitForChunksRender();
         return new Opened(world, stations);
+    }
+
+    /** The scene's failed commands, one per line; empty when it built as written. */
+    static String errors(TestSingleplayerContext world) {
+        return world.getServer().computeOnServer(server -> {
+            var list = server.getCommandStorage().get(Identifier.parse("gallery:state")).getListOrEmpty("errors");
+            StringBuilder out = new StringBuilder();
+            for (int i = 0; i < list.size(); i++) out.append(list.getStringOr(i, "?")).append('\n');
+            return out.toString();
+        });
     }
 
     private static void run(Path cwd, String... cmd) {
