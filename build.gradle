@@ -67,6 +67,23 @@ loom {
     }
 }
 
+// Self-checks: Fabric client gametests in src/gametest, run with `./gradlew :offrail:runClientGameTest`.
+// Each one loads a Test Gallery scene's check world (gen.py --checks) and asserts what a
+// station with a matching "check" id says, so Trev's walk-through keeps only what needs his eyes.
+// The run opens its own window, runs every check, and closes; it never touches run/ or a scene client.
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = 'offrail_checks'
+        enableGameTests = false
+        enableClientGameTests = true
+        eula = true
+    }
+}
+tasks.named('runClientGameTest') {
+    jvmArgs "-Dtestgallery.dir=${rootProject.file('Trevlar Mods Codebases/test-gallery')}"
+}
+
 jar {
     from('LICENSE') { rename { "${it}_${project.name}" } }
 }
