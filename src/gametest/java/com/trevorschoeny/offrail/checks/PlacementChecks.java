@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.entity.EntityTypeTest;
+import testgallery.SceneWorld;
 import net.minecraft.world.phys.AABB;
 
 /** Checks for the place-and-pickup scene (test-gallery/scenes/offrail/place-and-pickup.json). */
